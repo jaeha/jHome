@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: header">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div th:replace="fragments :: mainMenu" />
+
+    <h2 class="text-center">Directory Scan</h2>
+
+    <div id='app'>
+
+        <b-progress height="2rem">
+            <b-progress-bar :value="progress" :label="`${progress}%`" variant="primary"></b-progress-bar>
+        </b-progress>
+
+        <b-form-group label="Select Repository:" v-slot="{ ariaDescribedby }">
+            <b-form-radio-group
+                    id="radioRepository"
+                    v-model="selectedRepository"
+                    :options="optionsRepository"
+                    @change="onChangeRepo"
+                    :aria-describedby="ariaDescribedby">
+            </b-form-radio-group>
+        </b-form-group>
+
+        <b-form-group label="Select Directories:" v-slot="{ ariaDescribedby }">
+            <b-form-checkbox-group
+                    id="checkboxDirs"
+                    v-model="selectedDirs"
+                    :options="optionsDirs"
+                    :aria-describedby="ariaDescribedby">
+            </b-form-checkbox-group>
+        </b-form-group>
+
+
+        <!--div>Selected: <strong>{{ selected }}</strong></div-->
+        <div>
+            <b-button variant="primary" @click="onStart">Start</b-button>
+            <b-button variant="danger" @click="onStop">Stop</b-button>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+<script>
+new Vue({
+  el: "#app",
+  data: {
+    max: 100,
+    progress: 0,
+    timer: null,
+    selectedDirs: [], // Must be an array reference!
+    optionsDirs: [],
+    selectedRepository:'',
+    optionsRepository: [
+        {text: 'Video', value:0}, {text: 'Music', value:1}, {text: 'Photo', value:2}, {text: 'Book', value:3}
+        ]
+  },
+  mounted: function() {
+      this.refreshProgress();
+  },
+  beforeDestroy: function() {
+      clearInterval(this.timer)
+      this.timer = null
+  },
+  methods: {
+    onStart(event) {
+        event.preventDefault();
+        this.progress = 0;
+        axios.post('/scan/start', {dirs: this.selectedDirs, repoType: this.selectedRepository}).then((res) => {
+            this.refreshProgress();
+        })
+    },
+    onStop(event) {
+        event.preventDefault();
+        axios.get('/scan/stop').then((response) => {
+            clearInterval(this.timer);
+         // alert("Successfully Saved!");
+        })
+    },
+    onChangeRepo(event) {
+        //getting subdirs
+        axios.post('/scan/api/subdirs', {dirs: this.selectedDirs, repoType: this.selectedRepository}).then((response) => {
+                console.log(response.data);
+                this.optionsDirs = response.data;
+                if (this.optionsDirs.length != 0)
+                    this.optionsDirs.unshift("/");
+                else
+                    this.optionsDirs.push("/");
+        });
+    },
+    refreshProgress() {
+        this.timer = setInterval(() => {
+            this.getProgress();
+        }, 1000);
+    },
+    getProgress() {
+        axios.get('/scan/api/progress')
+            .then((response) => {
+                console.log(response.data);
+                this.progress = response.data;
+                if (response.data == 0 || response.data == 100) {
+                    clearInterval(this.timer);
+                }
+        });
+    }
+  }
+});
+</script>
+
+</html>

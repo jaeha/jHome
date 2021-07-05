@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: header">
+</head>
+
+<body>
+<div class="container">
+  <div th:replace="fragments :: mainMenu" />
+
+  <h3>Error: [[${errorMessage}]] </h3>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: header">
+</head>
+<body>
+<div class="container">
+  <div th:replace="fragments :: mainMenu" />
+
+  <div id='app' class="overflow-auto">
+
+    <h2>Book</h2>
+
+    <b-form-input v-model="keyword" placeholder="Search" @click="keyword=''"></b-form-input>
+
+    <b-table id="my-table" :items="items" :fields="fields" :per-page="perPage" :current-page="currentPage" :keyword="keyword" small>
+      <template #cell(title)="data">
+        <a :href="`book${data.item.url}`">{{data.value}}</a>
+      </template>
+    </b-table>
+    <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+    ></b-pagination>
+  </div>
+
+  <div th:replace="fragments :: footer" />
+</div>
+</body>
+
+<script>
+new Vue({
+  el: "#app",
+  data: {
+        perPage: 10,
+        currentPage: 1,
+        fields: ['title',  'releaseYear'],
+        dataList: [],
+        keyword:''
+  },
+  computed: {
+    rows() {
+        return this.items.length
+    },
+    items() {
+      return this.keyword ? this.dataList.filter(item => item.title.includes(this.keyword)) : this.dataList
+    }
+  },
+  mounted: function() {
+    this.fetchData()
+  },
+  methods: {
+    fetchData() {
+        axios.get('/book/api/list')
+            .then((response) => {
+                //console.log(response.data);
+                this.dataList = response.data;
+        });
+    }
+  }
+
+});
+</script>
+
+</html>

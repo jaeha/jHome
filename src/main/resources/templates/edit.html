@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: header">
+</head>
+<body>
+
+<div class="container">
+  <div th:replace="fragments :: mainMenu" />
+
+
+  <form th:action="@{/pages/save}" method="post">
+    <p>
+    <div class="input-group input-group-lg">
+      <span class="input-group-text" id="inputGroup-sizing-lg">Ttile</span>
+      <input type="text" class="form-control" id="inputTitle" name="title" th:value="${hPage.title}">
+      <input type="hidden" id="inputId" name="id" th:value="${hPage.id}">
+    </div>
+    <p>
+    <div>
+      <textarea rows="5" name="content" id="editor" th:text="${content}"></textarea>
+    </div>
+
+    <p><input type="submit" value="Submit"></p>
+  </form>
+
+</div>
+</body>
+
+<script th:src="@{/tinymce/tinymce.min.js}"></script>
+<script>
+      tinymce.init({
+        selector: '#editor'
+      });
+</script>
+
+</html>
