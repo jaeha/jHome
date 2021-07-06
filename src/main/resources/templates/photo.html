@@ -14,7 +14,7 @@
 
         <b-table id="my-table" :items="items" :fields="fields" :per-page="perPage" :current-page="currentPage" :keyword="keyword" small>
             <template #cell(title)="data">
-                <a :href="`photo{data.item.url}`">{{data.value}}</a>
+                <a :href="`photo${data.item.url}`">{{data.value}}</a>
             </template>
         </b-table>
         <b-pagination
