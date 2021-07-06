@@ -1,2 +1,2 @@
 # jHome
-A web application to manage media files and HTML pages
+A Web application to manage Video, Music and books on the file server.
